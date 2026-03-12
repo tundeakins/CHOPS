@@ -142,7 +142,9 @@ c1, c2, c3, c4 = st.columns(4)
 c1.metric("Earliest Phase Start",        f"{earliest_phase_start:.5f}")
 c2.metric("Latest Phase Start",          f"{latest_phase_start:.5f}")
 c3.metric("Start Window Width",          f"{slack_phase:.5f}  ({obs_slack_hr:.1f} hr)")
-c4.metric("Total Obs. Duration (ex. slack)", f"{obs_dur_hr:.2f} hr")
+CHEOPS_ORBIT_MIN = 98.77
+obs_dur_orbits = obs_dur_hr * 60.0 / CHEOPS_ORBIT_MIN
+c4.metric("Total Obs. Duration (ex. slack)", f"{obs_dur_hr:.2f} hr  ({obs_dur_orbits:.2f} orbits)")
 
 # ── Transit model (trapezoid) ─────────────────────────────────────────────────
 def trapezoid_transit(phase_arr, center, half_dur, ingress_frac, depth):
@@ -245,7 +247,7 @@ def _contact_label(ph, label, y_frac, color):
     ax.axvline(ph, color=color, ls=":", lw=1.0, alpha=0.7, zorder=4)
     y_data = y_bot + (y_top - y_bot) * y_frac
     ax.text(ph, y_data, f"{label}\n{ph:.5f}", ha="center", va="bottom",
-            fontsize=7, color=color, zorder=8,
+            fontsize=9, color=color, zorder=8, rotation=90,
             bbox=dict(boxstyle="round,pad=0.15", fc="#0e1117", ec="none", alpha=0.7))
 
 C_T2T3 = "#ff55cc"   # distinct colour for T2/T3
@@ -368,7 +370,7 @@ st.table({
         f"{post_trans_baseline_dur_hr:.2f} hr  ({post_baseline_phase:.5f} in phase)",
         f"±{t0_label}  (±{T0_unc_hr:.3f} hr  /  ±{t0_unc_phase:.5f} in phase)",
         f"{trans_depth_ppm} ppm  (fixed)",
-        f"{obs_dur_hr:.2f} hr",
+        f"{obs_dur_hr:.2f} hr  ({obs_dur_orbits:.2f} CHEOPS orbits)",
         f"{latest_phase_start:.6f}",
         f"{earliest_phase_start:.6f}",
         f"{slack_phase:.6f}  ({obs_slack_hr:.2f} hr)",
