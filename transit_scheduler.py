@@ -124,6 +124,32 @@ with _ing_exp:
                                        container=_ing_exp)
         ingress_dur_hr = ingress_raw / 60.0
 
+# Custom phase ranges of interest
+def _parse_ranges(text):
+    ranges = []
+    for line in text.strip().splitlines():
+        line = line.strip().replace(",", ":")
+        if not line:
+            continue
+        parts = line.split(":")
+        if len(parts) == 2:
+            try:
+                a, b = float(parts[0]), float(parts[1])
+                if a < b:
+                    ranges.append((a, b))
+            except ValueError:
+                pass
+    return ranges
+
+with st.sidebar.expander("Highlight custom phase ranges"):
+    st.markdown("Enter ranges as `start:end`, one per line.")
+    _ranges_raw = st.text_area("Phase ranges", value="", height=100,
+                               label_visibility="collapsed",
+                               help="e.g.  0.9500:0.9600\\n1.0400:1.0500")
+    _custom_color = st.color_picker("Highlight colour", value="#ffff00")
+
+custom_ranges = _parse_ranges(_ranges_raw)
+
 # Fixed transit depth
 trans_depth_ppm = 5000
 
@@ -225,6 +251,12 @@ ax.axvspan(egress_latest,        post_slack_start,    alpha=0.18, color=C_BASE, 
 ax.axvspan(post_slack_start,     post_baseline_end,   alpha=0.22, color=C_WIN,  zorder=1)
 ax.axvline(post_slack_start,     color=C_WIN, ls="--", lw=1.5, alpha=0.9)
 ax.fill_between(phase, flux_early, flux_late, alpha=0.28, color=C_T0, zorder=3)
+
+# ── Custom phase range highlights ─────────────────────────────────────────────
+for r_start, r_end in custom_ranges:
+    ax.axvspan(r_start, r_end, alpha=0.35, color=_custom_color, zorder=2)
+    ax.axvline(r_start, color=_custom_color, ls=":", lw=1.0, alpha=0.8, zorder=3)
+    ax.axvline(r_end,   color=_custom_color, ls=":", lw=1.0, alpha=0.8, zorder=3)
 
 # ── Mid-transit vertical line ─────────────────────────────────────────────────
 ax.axvline(transit_center, color="#ffffff", ls=":", lw=1.2, alpha=0.5, zorder=4)
