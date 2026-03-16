@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-st.set_page_config(page_title="CHOPS", layout="wide")
+st.set_page_config(page_title="CHORE", layout="wide")
 
-st.title("CHOPS")
-st.markdown("**C**HEOPS **H**elper for **O**bservation **P**hase **S**cheduling  —  visualize the observation window for a planetary transit.")
+st.title("CHORE")
+st.markdown("**C**HEOPS **H**elper for **O**bservation **R**equest **E**ntry  —  visualize the observation window for a planetary transit.")
 
 # ── Synced slider + number-input helper ──────────────────────────────────────
 def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=None,
@@ -442,7 +442,7 @@ st.caption(
 
 # ── Parameter summary table ───────────────────────────────────────────────────
 st.divider()
-st.subheader("PHT2 input values")
+st.subheader("PHT2 parameter values")
 _params = ["Transit Period [days]", "Visit Duration [CHEOPS orbits]", "Earliest Start Phase", "Latest Start Phase"]
 _values = [
     f"{P_days:.2f}",
