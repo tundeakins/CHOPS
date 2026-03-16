@@ -20,12 +20,16 @@ def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=
     n_key = f"_ni_{key}"
     if key not in st.session_state:
         st.session_state[key] = float(default)
+    if n_key not in st.session_state:
+        st.session_state[n_key] = float(default)
 
     if log_scale:
         import math as _math
         log_min = _math.log10(min_val)
         log_max = _math.log10(max_val)
         log_step = (log_max - log_min) / 400  # ~400 steps across the range
+        if s_key not in st.session_state:
+            st.session_state[s_key] = _math.log10(float(default))
 
         def _on_slider():
             st.session_state[key] = round(10 ** st.session_state[s_key], 6)
@@ -38,15 +42,16 @@ def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=
         col1, col2 = ct.columns([3, 1])
         with col1:
             st.slider(label, min_value=log_min, max_value=log_max,
-                      value=_math.log10(float(st.session_state[key])),
                       step=log_step, key=s_key, on_change=_on_slider,
                       format="", help=help)
         with col2:
             st.number_input("val", min_value=float(min_val), max_value=float(max_val),
-                            value=float(st.session_state[key]), step=float(step),
-                            key=n_key, on_change=_on_input,
+                            step=float(step), key=n_key, on_change=_on_input,
                             label_visibility="collapsed", format=fmt)
     else:
+        if s_key not in st.session_state:
+            st.session_state[s_key] = float(default)
+
         def _on_slider():
             st.session_state[key] = float(st.session_state[s_key])
             st.session_state[n_key] = st.session_state[key]
@@ -58,12 +63,10 @@ def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=
         col1, col2 = ct.columns([3, 1])
         with col1:
             st.slider(label, min_value=float(min_val), max_value=float(max_val),
-                      value=float(st.session_state[key]), step=float(step),
-                      key=s_key, on_change=_on_slider, help=help)
+                      step=float(step), key=s_key, on_change=_on_slider, help=help)
         with col2:
             st.number_input("val", min_value=float(min_val), max_value=float(max_val),
-                            value=float(st.session_state[key]), step=float(step),
-                            key=n_key, on_change=_on_input,
+                            step=float(step), key=n_key, on_change=_on_input,
                             label_visibility="collapsed", format=fmt)
     return st.session_state[key]
 
