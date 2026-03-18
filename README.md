@@ -37,6 +37,9 @@ streamlit run transit_scheduler.py
 
 Then open the URL shown in the terminal (usually `http://localhost:8501`).
 
+The app is hosted at `https://cheops-chore.streamlit.app/`
+
+
 ### Sidebar parameters
 
 | Parameter | Description |

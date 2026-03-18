@@ -2,11 +2,25 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+from _version import __version__
 
 st.set_page_config(page_title="CHORE", layout="wide")
 
-st.title("CHORE")
-st.markdown("**C**HEOPS **H**elper for **O**bservation **R**equest **E**ntry  —  visualize the observation window for a planetary transit.")
+_BLUE = "#4488ff"
+st.markdown(
+    f"# <span style='color:{_BLUE}'>CHORE</span> "
+    f"<small style='font-size:0.45em; font-weight:400; color:grey;'>v{__version__}</small>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    f"<span style='color:{_BLUE};font-weight:700'>C</span>HEOPS "
+    f"<span style='color:{_BLUE};font-weight:700'>H</span>elper for "
+    f"<span style='color:{_BLUE};font-weight:700'>O</span>bservation "
+    f"<span style='color:{_BLUE};font-weight:700'>R</span>equest "
+    f"<span style='color:{_BLUE};font-weight:700'>E</span>ntry "
+    f"— visualize the observation window for a planetary transit.",
+    unsafe_allow_html=True,
+)
 
 # ── Synced slider + number-input helper ──────────────────────────────────────
 def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=None,
@@ -41,8 +55,10 @@ def synced_slider(label, min_val, max_val, default, step, key, fmt="%.2f", help=
             st.session_state[n_key] = st.session_state[key]
 
         def _on_input():
-            st.session_state[key] = float(np.clip(st.session_state[n_key], min_val, max_val))
-            st.session_state[s_key] = _snap(st.session_state[key])
+            snapped = _snap(float(np.clip(st.session_state[n_key], min_val, max_val)))
+            st.session_state[key] = snapped
+            st.session_state[s_key] = snapped
+            st.session_state[n_key] = snapped
 
         col1, col2 = ct.columns([3, 1])
         with col1:
@@ -381,13 +397,14 @@ else:
 
 # ── Obs-start / obs-end annotations ──────────────────────────────────────────
 _obs_labels = [
-    (earliest_phase_start, "Earliest\nstart", "red"),
-    (latest_phase_start,   "Latest\nstart",   "white"),
-    (post_slack_start,     "Earliest\nend",   "red"),
-    (post_baseline_end,    "Latest\nend",     "white"),
+    (earliest_phase_start, "Earliest\nstart", "red",   True),
+    (latest_phase_start,   "Latest\nstart",   "white", True),
+    (post_slack_start,     "Earliest\nend",   "red",   False),
+    (post_baseline_end,    "Latest\nend",     "white", False),
 ]
-for ph, lbl, col in _obs_labels:
-    ax.text(ph, BAN_LO_F - 0.01, f"{lbl}\n{ph:.5f}", ha="center", va="top",
+for ph, lbl, col, show_ph in _obs_labels:
+    txt = f"{lbl}\n{ph:.5f}" if show_ph else lbl
+    ax.text(ph, BAN_LO_F - 0.01, txt, ha="center", va="top",
             transform=_btrans, fontsize=10, color=col, zorder=8,
             bbox=dict(boxstyle="round,pad=0.15", fc="#0e1117", ec="none", alpha=0.7))
 
@@ -405,7 +422,7 @@ legend_handles = [
 ]
 # ax.legend(handles=legend_handles, loc="lower left",
 #           facecolor="#1e2130", labelcolor=C_TICK, fontsize=9, framealpha=0.85)
-ax.set_title("CHOPS — Planetary Transit Observation Window", color="white", fontsize=13, pad=10)
+ax.set_title("CHORE — Observation Window", color="white", fontsize=13, pad=10)
 
 ax.set_xlabel("Orbital Phase", color=C_TICK, fontsize=11)
 ax.set_ylabel("Relative Flux", color=C_TICK, fontsize=11)
